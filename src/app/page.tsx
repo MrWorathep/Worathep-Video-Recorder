@@ -3,23 +3,50 @@ import { useState, useEffect } from "react";
 import useMediaRecorder from "@wmik/use-media-recorder";
 import classNames from "classnames";
 import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Home: React.FC = () => {
   const [mediaStream, setMediaStream] = useState<MediaStream | null>(null);
   const [video, setVideo] = useState<HTMLVideoElement | null>(null);
 
-  const { status, startRecording, stopRecording, mediaBlob } = useMediaRecorder(
-    {
-      recordScreen: false,
-      blobOptions: { type: "video/webm" },
-      mediaStreamConstraints: { audio: true, video: true },
+  /** ⬇️ เพิ่มการดัก error ที่มาจาก MediaRecorder */
+  const {
+    status,
+    startRecording,
+    stopRecording,
+    mediaBlob,
+    error, // <-- ใช้งาน error ที่ hook ส่งคืนมา
+  } = useMediaRecorder({
+    recordScreen: false,
+    blobOptions: { type: "video/webm" },
+    mediaStreamConstraints: { audio: true, video: true },
+  });
+
+  /** ถ้า MediaRecorder ขึ้น NotReadableError (device in use) ให้ Toast แจ้งผู้ใช้ */
+  useEffect(() => {
+    if (error && error.name === "NotReadableError") {
+      toast.error(
+        "กล้องหรือไมโครโฟนถูกใช้งานโดยแอปอื่นอยู่ กรุณาปิดก่อนแล้วลองใหม่"
+      );
     }
-  );
+  }, [error]);
 
   useEffect(() => {
-    let currentStream: MediaStream;
+    let currentStream: MediaStream | undefined;
 
     async function getStream() {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        toast.error("เบราว์เซอร์ของคุณไม่รองรับการใช้งานกล้องและไมโครโฟน");
+        return;
+      }
+
+      if (typeof window.MediaRecorder === "undefined") {
+        toast.error(
+          "เบราว์เซอร์ของคุณไม่รองรับการบันทึกวิดีโอ (MediaRecorder API)"
+        );
+        return;
+      }
+
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
           audio: true,
@@ -32,6 +59,11 @@ const Home: React.FC = () => {
           toast.info(
             "กรุณาอนุญาตเข้าถึงกล้องและไมโครโฟน เพื่อใช้งานฟีเจอร์นี้"
           );
+        } else if (
+          err instanceof DOMException &&
+          err.name === "NotReadableError"
+        ) {
+          toast.error("กล้อง/ไมค์กำลังถูกใช้งานโดยโปรแกรมอื่น");
         } else {
           console.error(err);
           toast.error("เกิดข้อผิดพลาดไม่ทราบสาเหตุ");
@@ -59,12 +91,7 @@ const Home: React.FC = () => {
   const mediaBlobUrl = mediaBlob ? URL.createObjectURL(mediaBlob) : null;
 
   return (
-    <main
-      className="flex flex-col items-center justify-center min-h-screen gap-8 p-8 bg-gradient-to-br from-blue-100 via-pink-100 to-purple-100
-
-
- text-gray-800"
-    >
+    <main className="flex flex-col items-center justify-center min-h-screen gap-8 p-8 bg-gradient-to-br from-blue-100 via-pink-100 to-purple-100 text-gray-800">
       <h1 className="text-2xl sm:text-3xl md:text-4xl font-semibold">
         Worathep Video Recorder
       </h1>
@@ -110,7 +137,6 @@ const Home: React.FC = () => {
         </button>
       </div>
 
-      {/* preview */}
       {status === "recording" && (
         <div className="flex flex-col items-center mt-8">
           <video
@@ -118,13 +144,11 @@ const Home: React.FC = () => {
             autoPlay
             muted
             playsInline
-            controls
             className="w-full max-w-3xl rounded-lg shadow-md border-2 border-green-500"
           />
         </div>
       )}
 
-      {/* video */}
       {mediaBlobUrl && status !== "recording" && (
         <div className="flex flex-col items-center mt-8">
           <video
@@ -141,6 +165,7 @@ const Home: React.FC = () => {
           </a>
         </div>
       )}
+
       <ToastContainer
         position="top-center"
         autoClose={3000}
