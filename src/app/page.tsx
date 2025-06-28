@@ -154,6 +154,8 @@ const Home: React.FC = () => {
           <video
             src={mediaBlobUrl}
             controls
+            playsInline
+            muted
             className="w-full max-w-3xl rounded-lg shadow-md border-2 border-blue-500"
           />
           <a
