@@ -3,24 +3,17 @@ import { useState, useEffect } from "react";
 import useMediaRecorder from "@wmik/use-media-recorder";
 import classNames from "classnames";
 import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 
 const Home: React.FC = () => {
   const [mediaStream, setMediaStream] = useState<MediaStream | null>(null);
   const [video, setVideo] = useState<HTMLVideoElement | null>(null);
 
-  /** ⬇️ เพิ่มการดัก error ที่มาจาก MediaRecorder */
-  const {
-    status,
-    startRecording,
-    stopRecording,
-    mediaBlob,
-    error, // <-- ใช้งาน error ที่ hook ส่งคืนมา
-  } = useMediaRecorder({
-    recordScreen: false,
-    blobOptions: { type: "video/webm" },
-    mediaStreamConstraints: { audio: true, video: true },
-  });
+  const { status, startRecording, stopRecording, mediaBlob, error } =
+    useMediaRecorder({
+      recordScreen: false,
+      blobOptions: { type: "video/webm" },
+      mediaStreamConstraints: { audio: true, video: true },
+    });
 
   /** ถ้า MediaRecorder ขึ้น NotReadableError (device in use) ให้ Toast แจ้งผู้ใช้ */
   useEffect(() => {
@@ -155,7 +148,7 @@ const Home: React.FC = () => {
             src={mediaBlobUrl}
             controls
             playsInline
-            muted
+            autoPlay={false}
             className="w-full max-w-3xl rounded-lg shadow-md border-2 border-blue-500"
           />
           <a
