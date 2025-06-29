@@ -100,7 +100,7 @@ const Home: React.FC = () => {
   return (
     <main className="flex flex-col items-center justify-center min-h-screen gap-8 p-8 bg-gradient-to-br from-blue-100 via-pink-100 to-purple-100 text-gray-800">
       <h1 className="text-2xl sm:text-3xl md:text-4xl font-semibold">
-        Worathep Video Recorder
+        Video Recorder
       </h1>
 
       <div
