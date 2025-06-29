@@ -175,7 +175,7 @@ const Home: React.FC = () => {
 
           <a
             href={mediaBlobUrl}
-            download="recording.webm"
+            download="video-record.webm"
             className="mt-4 underline font-medium text-blue-700 hover:text-blue-900"
           >
             Download
