@@ -1,9 +1,11 @@
-declare global {
-  interface Window {
-    MSStream?: object;
-  }
-}
+import Bowser from "bowser";
 
 export function isIOS() {
-  return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  const browser = Bowser.getParser(window.navigator.userAgent);
+  const osName = browser.getOSName(true);
+  const platformType = browser.getPlatformType(true);
+
+  return (
+    osName === "ios" && (platformType === "mobile" || platformType === "tablet")
+  );
 }
