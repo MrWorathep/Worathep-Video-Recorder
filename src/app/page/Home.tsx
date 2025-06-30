@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import useMediaRecorder from "@wmik/use-media-recorder";
 import classNames from "classnames";
 import { ToastContainer, toast } from "react-toastify";
-import { isIOS } from "@/ีcheckIOS/isIOS";
+import { isIOS } from "@/checkIOS/isIOS";
 
 const Home: React.FC = () => {
   const [mediaStream, setMediaStream] = useState<MediaStream | null>(null);
